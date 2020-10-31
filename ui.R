@@ -1,49 +1,34 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
-library(shiny)
-
-# Define UI for application that draws a histogram
+# Define UI
 ui <- fluidPage(
-
+    
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+    titlePanel("Reproducibility Curve"),
+    
+    fluidRow(
+        
+        column(3,
+            
+            sliderInput("repro_value", "Reproducibility", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
+            hr(),
+            selectInput("param1_value", "Parameter 1", choices = c("All","TRUE","FALSE"), selected = "All"),
+            
+            sliderInput("param2_value", "Parameter 2", min = 0, max = 1, step = 0.1, value = c(0,1)),
+            
+            sliderInput("param3_value", "Parameter 3", min = 1, max = 4, step = 1, value = c(1,4))
         ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
+        
+        column(6,
+            plotOutput("repro_plot", height = 240),
+            hr(),
+            plotOutput("specification_plot", height = 180)
+        ),
+        
+        column(3,
+           plotOutput("param1_plot", height = 170),
+           plotOutput("param2_plot", height = 170),
+           plotOutput("param3_plot", height = 170)
         )
-    )
+        
+    )   
 )
-
-# Define server logic required to draw a histogram
-server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
-}
-
-# Run the application 
-shinyApp(ui = ui, server = server)
+    
