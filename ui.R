@@ -10,11 +10,13 @@ ui <- fluidPage(
             
             sliderInput("repro_value", "Reproducibility", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
             hr(),
-            selectInput("param1_value", "Parameter 1", choices = c("All","TRUE","FALSE"), selected = "All"),
+            sliderInput("bias_value", "Bias", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
             
-            sliderInput("param2_value", "Parameter 2", min = 0, max = 1, step = 0.1, value = c(0,1)),
+            sliderInput("prevalence_value", "Prevalence", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
             
-            sliderInput("param3_value", "Parameter 3", min = 1, max = 4, step = 1, value = c(1,4))
+            sliderInput("interlab_value", "Interlab Variation", min = 1, max = 4, step = 1, value = c(1,4)),
+            
+            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
         ),
         
         column(6,

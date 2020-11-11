@@ -18,6 +18,7 @@ SIMS = SIMS %>%
     weight.label = paste0("% Above Min. = ", 100 * weightB, "%"),
     power.label = paste0("Power = ", 100 * typical.power, "%"),
     bias.label = paste0("Bias = ", 100 * bias.level, "%"),
+    interlab.var.p = round(interlab.var / (interlab.var + 1), 2),
     interlab.label = paste0("Interlab Var. = ", round(100 * interlab.var / (interlab.var + 1), 0), "%")
   )
 
@@ -39,5 +40,7 @@ SIMS_WIDE = bind_cols(
 )
 
 SIMS = bind_cols(list(SIMS, SIMS_WIDE))
-  
+
+SIMS$index = 1:nrow(SIMS)  
+
 SELECTION = SIMS
