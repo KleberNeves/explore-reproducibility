@@ -15,7 +15,7 @@ SIMS$weightB = ifelse(SIMS$AboveMin %in% c(0.2,0.4,0.6,0.8), SIMS$AboveMin,
                        ifelse(SIMS$AboveMin == 0.62, 0.6, 0.8)))))
 SIMS = SIMS %>%
   mutate(
-    weight.label = paste0("% Above Min. = ", 100 * weightB, "%"),
+    weight.label = paste0("Above Min. = ", 100 * weightB, "%"),
     power.label = paste0("Power = ", 100 * typical.power, "%"),
     bias.label = paste0("Bias = ", 100 * bias.level, "%"),
     interlab.var.p = round(interlab.var / (interlab.var + 1), 2),
@@ -41,6 +41,7 @@ SIMS_WIDE = bind_cols(
 
 SIMS = bind_cols(list(SIMS, SIMS_WIDE))
 
-SIMS$index = 1:nrow(SIMS)  
+SIMS$index = 1:nrow(SIMS)
+SIMS$repro_rate = SIMS$`Orig-in-RMA-PI_ReproRate_All`
 
 SELECTION = SIMS

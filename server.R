@@ -7,7 +7,7 @@ server <- function(input, output, session) {
         bias.level >= input$bias_value[1] / 100 & bias.level <= input$bias_value[2] / 100 &
         typical.power >= input$power_value[1] / 100 & typical.power <= input$power_value[2] / 100 &
         weightB >= input$prevalence_value[1] / 100 & weightB <= input$prevalence_value[2] / 100 &
-        interlab.var >= input$interlab_value[1] / 100 & interlab.var <= input$interlab_value[2] / 100
+        interlab.var.p >= input$interlab_value[1] / 100 & interlab.var <= input$interlab_value[2] / 100
       )
     
     if (nrow(SELECTION) > 1000) {
@@ -56,9 +56,9 @@ server <- function(input, output, session) {
   
   draw_specification_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
     SPECIFICATION = SELECTION %>%
-      select(index, repro_rate, param1_T, param2_0.1, param2_0.3, param2_0.5, param2_0.7, param3_1, param3_2, param3_3, param3_4) %>%
+      select(all_of(c("index","repro_rate","Above Min. = 20%","Above Min. = 40%","Above Min. = 80%","Above Min. = 60%","Bias = 0%","Bias = 50%","Bias = 20%","Bias = 80%","Interlab Var. = 0%","Interlab Var. = 50%","Interlab Var. = 67%","Interlab Var. = 33%","Power = 20%","Power = 50%","Power = 80%"))) %>%
       pivot_longer(cols = -c(index, repro_rate)) %>%
-      mutate(param = str_extract(name, "param[0-9]"))
+      mutate(param = name)
 
     ggplot(SPECIFICATION) +
       aes(x = reorder(index, repro_rate), y = name, fill = param, alpha = as.numeric(value)) +

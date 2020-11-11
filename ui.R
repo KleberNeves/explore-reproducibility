@@ -14,7 +14,7 @@ ui <- fluidPage(
             
             sliderInput("prevalence_value", "Prevalence", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
             
-            sliderInput("interlab_value", "Interlab Variation", min = 1, max = 4, step = 1, value = c(1,4)),
+            sliderInput("interlab_value", "Interlab Variation", min = 0, max = 100, step = 10, value = c(0,100)),
             
             sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
         ),
@@ -26,9 +26,10 @@ ui <- fluidPage(
         ),
         
         column(3,
-           plotOutput("param1_plot", height = 170),
-           plotOutput("param2_plot", height = 170),
-           plotOutput("param3_plot", height = 170)
+           plotOutput("bias_plot", height = 170),
+           plotOutput("prevalence_plot", height = 170),
+           plotOutput("interlab_plot", height = 170),
+           plotOutput("power_plot", height = 170)
         )
         
     )   
