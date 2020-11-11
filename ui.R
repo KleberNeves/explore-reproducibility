@@ -7,6 +7,10 @@ ui <- fluidPage(
     fluidRow(
         
         column(3,
+            selectInput("repro_measure", "Measure",
+                        choices = c("Original in replication interval",
+                                    "Significance and same sense",
+                                    "Significance vote")),
             
             sliderInput("repro_value", "Reproducibility", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
             hr(),
@@ -16,7 +20,9 @@ ui <- fluidPage(
             
             sliderInput("interlab_value", "Interlab Variation", min = 0, max = 100, step = 10, value = c(0,100)),
             
-            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
+            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
+            hr(),
+            selectInput("distribution", "Underlying Model", choices = c("Two Peaks", "Single Normal"))
         ),
         
         column(6,
