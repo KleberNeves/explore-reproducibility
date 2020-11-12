@@ -52,3 +52,10 @@ repro_measure_choices = list(
   "Significance and same sense" = "RMA-SSS_ReproRate_All",
   "Significance vote" = "VOTE-SSS_ReproRate_All"
 )
+
+spec_colors = c(
+  RColorBrewer::brewer.pal(5, "Blues")[2:5],
+  RColorBrewer::brewer.pal(5, "Greens")[2:5],
+  RColorBrewer::brewer.pal(5, "Purples")[2:5],
+  RColorBrewer::brewer.pal(5, "Oranges")[2:5]
+)

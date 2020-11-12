@@ -6,7 +6,7 @@ ui <- fluidPage(
     
     fluidRow(
         
-        column(2,
+        column(3,
             selectInput("repro_measure", "Measure", choices = names(repro_measure_choices)),
             
             sliderInput("repro_value", "Reproducibility", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
@@ -22,17 +22,19 @@ ui <- fluidPage(
             selectInput("distribution", "Underlying Model", choices = c("Two Peaks", "Single Normal"))
         ),
         
-        column(8,
+        column(6,
             plotOutput("repro_plot", height = 240),
             hr(),
             plotOutput("specification_plot", height = 330)
         ),
         
-        column(2,
-           plotOutput("bias_plot", height = 140),
-           plotOutput("prevalence_plot", height = 140),
-           plotOutput("interlab_plot", height = 140),
-           plotOutput("power_plot", height = 140)
+        column(3,
+           selectInput("plot_type", "Plot Type", choices = c("Specification", "Frequency")),
+           hr(),
+           plotOutput("bias_plot", height = 130),
+           plotOutput("prevalence_plot", height = 130),
+           plotOutput("interlab_plot", height = 130),
+           plotOutput("power_plot", height = 130)
         )
         
     )   
