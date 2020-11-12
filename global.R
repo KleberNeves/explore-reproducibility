@@ -42,6 +42,13 @@ SIMS_WIDE = bind_cols(
 SIMS = bind_cols(list(SIMS, SIMS_WIDE))
 
 SIMS$index = 1:nrow(SIMS)
+SIMS$distribution = recode(SIMS$scenarioName, `Two Peaks (SD = 0.1)` = "Two Peaks")
 SIMS$repro_rate = SIMS$`Orig-in-RMA-PI_ReproRate_All`
 
 SELECTION = SIMS
+
+repro_measure_choices = list(
+  "Original in replication interval" = "Orig-in-RMA-PI_ReproRate_All",
+  "Significance and same sense" = "RMA-SSS_ReproRate_All",
+  "Significance vote" = "VOTE-SSS_ReproRate_All"
+)

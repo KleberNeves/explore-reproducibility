@@ -1,13 +1,16 @@
 server <- function(input, output, session) {
   
-  observeEvent(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  observeEvent(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+    repro_colname = repro_measure_choices[[input$repro_measure]]
     SELECTION <<- SIMS %>%
+      mutate(repro_rate = SIMS[,repro_colname]) %>%
       filter(
+        distribution == input$distribution,
         repro_rate >= input$repro_value[1] / 100 & repro_rate <= input$repro_value[2] / 100 &
         bias.level >= input$bias_value[1] / 100 & bias.level <= input$bias_value[2] / 100 &
         typical.power >= input$power_value[1] / 100 & typical.power <= input$power_value[2] / 100 &
         weightB >= input$prevalence_value[1] / 100 & weightB <= input$prevalence_value[2] / 100 &
-        interlab.var.p >= input$interlab_value[1] / 100 & interlab.var <= input$interlab_value[2] / 100
+        interlab.var.p >= input$interlab_value[1] / 100 & interlab.var.p <= input$interlab_value[2] / 100
       )
     
     if (nrow(SELECTION) > 1000) {
@@ -15,36 +18,39 @@ server <- function(input, output, session) {
     }
   })
   
-  draw_bias_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  draw_bias_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
-      aes(x = bias.level) +
+      aes(x = as.factor(bias.level)) +
       geom_bar() +
+      labs(x = "Bias", y = "") +
       theme_minimal()
   })
   
-  draw_prevalence_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  draw_prevalence_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
-      aes(x = weightB) +
-      geom_density() +
-      xlim(c(0,1)) +
-      theme_minimal()
-  })
-  
-  draw_interlab_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
-    ggplot(SELECTION) +
-      aes(x = interlab.var) +
+      aes(x = as.factor(weightB)) +
       geom_bar() +
+      labs(x = "Prevalence", y = "") +
       theme_minimal()
   })
   
-  draw_power_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  draw_interlab_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
-      aes(x = typical.power) +
+      aes(x = as.factor(interlab.var.p)) +
       geom_bar() +
+      labs(x = "Interlab variation", y = "") +
       theme_minimal()
   })
   
-  draw_repro_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  draw_power_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+    ggplot(SELECTION) +
+      aes(x = as.factor(typical.power)) +
+      geom_bar() +
+      labs(x = "Power", y = "") +
+      theme_minimal()
+  })
+  
+  draw_repro_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
       aes(x = reorder(index, repro_rate), y = repro_rate) +
       geom_point(size = 0.5) +
@@ -54,7 +60,7 @@ server <- function(input, output, session) {
             panel.grid = element_blank())
   })
   
-  draw_specification_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value), {
+  draw_specification_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     SPECIFICATION = SELECTION %>%
       select(all_of(c("index","repro_rate","Above Min. = 20%","Above Min. = 40%","Above Min. = 80%","Above Min. = 60%","Bias = 0%","Bias = 50%","Bias = 20%","Bias = 80%","Interlab Var. = 0%","Interlab Var. = 50%","Interlab Var. = 67%","Interlab Var. = 33%","Power = 20%","Power = 50%","Power = 80%"))) %>%
       pivot_longer(cols = -c(index, repro_rate)) %>%
@@ -62,7 +68,7 @@ server <- function(input, output, session) {
 
     ggplot(SPECIFICATION) +
       aes(x = reorder(index, repro_rate), y = name, fill = param, alpha = as.numeric(value)) +
-      geom_tile() +
+      geom_tile(height = 0.4) +
       scale_alpha(range = c(0,1)) +
       labs(x = "", y = "") +
       theme_minimal() +
