@@ -1,7 +1,7 @@
 library(shiny)
 library(tidyverse)
 
-load(file = "sim_data.RData")
+load(file = "simdata-explore-1120.RData")
 SIMS = repdata
 rm(repdata)
 
@@ -58,4 +58,11 @@ spec_colors = c(
   RColorBrewer::brewer.pal(5, "Greens")[2:5],
   RColorBrewer::brewer.pal(5, "Purples")[2:5],
   RColorBrewer::brewer.pal(5, "Oranges")[2:5]
+)
+
+spec_parameters = c(
+  "Above Min. = 20%","Above Min. = 40%","Above Min. = 80%","Above Min. = 60%",
+  "Bias = 0%","Bias = 50%","Bias = 20%","Bias = 80%",
+  "Interlab Var. = 0%","Interlab Var. = 50%","Interlab Var. = 67%","Interlab Var. = 33%",
+  "Power = 20%","Power = 50%","Power = 80%"
 )
