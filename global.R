@@ -1,5 +1,6 @@
 library(shiny)
 library(tidyverse)
+library(cowplot)
 
 load(file = "simdata-explore-1120.RData")
 SIMS = repdata

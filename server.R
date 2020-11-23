@@ -51,79 +51,76 @@ server <- function(input, output, session) {
   })
   
   draw_repro_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
-    ggplot(SELECTION) +
+    
+    # Making the plot with reproducibility rates
+    plot_repro = ggplot(SELECTION) +
       aes(x = reorder(index, repro_rate), y = repro_rate) +
       geom_point(size = 0.5) +
       labs(x = "", y = "Reproducibility Rate") +
       ylim(c(0,1)) +
       theme_minimal() +
       theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-            panel.grid = element_blank())
-  })
-  
-  draw_specification_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution, input$plot_type), {
+            panel.grid = element_blank(), plot.title = element_blank())
+
+    # Making the frequency of specifications graph
+    SPECIFICATION = SELECTION %>%
+      select(all_of(c("index","repro_rate", spec_parameters))) %>%
+      pivot_longer(cols = -c(index, repro_rate)) %>%
+      mutate(param = name,
+             param_type = ifelse(str_detect(param, "Above"), "Above Min",
+                          ifelse(str_detect(param, "Bias"), "Bias",
+                          ifelse(str_detect(param, "Power"), "Power",
+                          ifelse(str_detect(param, "Interlab"), "Interlab Var","")))),
+             param_type = factor(param_type, levels = c("Power","Interlab Var","Bias","Above Min")))
     
-    if (input$plot_type == "Frequency") {
+    DF = SPECIFICATION %>%
+      arrange(repro_rate)
+    
+    unique_indexes = unique(DF$index)
+    DF$bindex = map_int(DF$index, function (x) { which(unique_indexes == x) })
       
-      SPECIFICATION = SELECTION %>%
-        select(all_of(c("index","repro_rate", spec_parameters))) %>%
-        pivot_longer(cols = -c(index, repro_rate)) %>%
-        mutate(param = name,
-               param_type = ifelse(str_detect(param, "Above"), "Above Min",
-                            ifelse(str_detect(param, "Bias"), "Bias",
-                            ifelse(str_detect(param, "Power"), "Power",
-                            ifelse(str_detect(param, "Interlab"), "Interlab Var","")))),
-               param_type = factor(param_type, levels = c("Power","Interlab Var","Bias","Above Min")))
-      
-      DF = SPECIFICATION %>%
-        arrange(repro_rate)
-      
-      unique_indexes = unique(DF$index)
-      DF$bindex = map_int(DF$index, function (x) { which(unique_indexes == x) })
-        
-      DF = DF %>%
-        mutate(bin = (bindex - 1) %/% 10) %>%
-        group_by(bin, param_type, param, .drop = F) %>%
-        summarise(N = sum(value)) %>%
-        mutate(perc = N / sum(N))
-      
-      ggplot(DF) +
-        aes(x = bin, y = perc, fill = param) +
-        geom_col(position = "stack") +
-        labs(x = "", y = "") +
-        scale_fill_manual(breaks = spec_parameters, values = spec_colors) +
-        facet_wrap(~param_type, ncol = 1) +
-        theme_minimal() +
-        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-              panel.grid = element_blank(), legend.position = "none",
-              axis.text.y = element_text(size = 11))
-      
-    } else {
-      
-      SPECIFICATION = SELECTION %>%
-        select(all_of(c("index","repro_rate", spec_parameters))) %>%
-        pivot_longer(cols = -c(index, repro_rate)) %>%
-        mutate(param = name)
+    DF = DF %>%
+      mutate(bin = (bindex - 1) %/% 10) %>%
+      group_by(bin, param_type, param, .drop = F) %>%
+      summarise(N = sum(value)) %>%
+      mutate(perc = N / sum(N))
+    
+    plot_spec = ggplot(DF) +
+      aes(x = bin, y = perc, fill = param) +
+      geom_col(position = "stack") +
+      labs(x = "", y = "") +
+      scale_fill_manual(breaks = spec_parameters, values = spec_colors) +
+      scale_x_discrete(expand = c(0,0)) +
+      facet_wrap(~param_type, ncol = 1) +
+      theme_minimal() +
+      theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+            panel.grid = element_blank(), legend.position = "none",
+            axis.text.y = element_text(size = 11))
   
-      ggplot(SPECIFICATION) +
-        aes(x = reorder(index, repro_rate), y = name, fill = param, alpha = as.numeric(value)) +
-        geom_tile(height = 0.4) +
-        scale_alpha(range = c(0,1)) +
-        scale_fill_manual(breaks = spec_parameters, values = spec_colors) +
-        labs(x = "", y = "") +
-        theme_minimal() +
-        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-              legend.position = "none", panel.grid = element_blank(),
-              axis.text.y = element_text(size = 11))
-    }
+    # Making the specification curve graph  
+    SPECIFICATION = SELECTION %>%
+      select(all_of(c("index","repro_rate", spec_parameters))) %>%
+      pivot_longer(cols = -c(index, repro_rate)) %>%
+      mutate(param = name)
+
+    plot_spec2 = ggplot(SPECIFICATION) +
+      aes(x = reorder(index, repro_rate), y = name, fill = param, alpha = as.numeric(value)) +
+      geom_tile(height = 0.4) +
+      scale_alpha(range = c(0,1)) +
+      scale_fill_manual(breaks = spec_parameters, values = spec_colors) +
+      labs(x = "", y = "") +
+      theme_minimal() +
+      theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+            legend.position = "none", panel.grid = element_blank(),
+            axis.text.y = element_text(size = 11), plot.title = element_blank())
+    
+    # Plotting the aligned graphs
+    plot_grid(plot_repro, plot_spec2, plot_spec, align = "v", axis = "l",
+              ncol = 1, nrow = 3, rel_heights = c(1,1.5,1.5))
   })
   
   output$repro_plot = renderPlot({
     draw_repro_plot()
-  })
-  
-  output$specification_plot = renderPlot({
-    draw_specification_plot()
   })
   
   output$bias_plot = renderPlot({

@@ -17,19 +17,15 @@ ui <- fluidPage(
             
             sliderInput("interlab_value", "Interlab Variation", min = 0, max = 100, step = 10, value = c(0,100)),
             
-            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
-            hr(),
-            selectInput("distribution", "Underlying Model", choices = c("Two Peaks", "Single Normal"))
+            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
         ),
         
         column(6,
-            plotOutput("repro_plot", height = 240),
-            hr(),
-            plotOutput("specification_plot", height = 330)
+            plotOutput("repro_plot", height = 600, width = "95%")
         ),
         
         column(3,
-           selectInput("plot_type", "Plot Type", choices = c("Specification", "Frequency")),
+               selectInput("distribution", "Underlying Model", choices = c("Two Peaks", "Single Normal")),
            hr(),
            plotOutput("bias_plot", height = 130),
            plotOutput("prevalence_plot", height = 130),
