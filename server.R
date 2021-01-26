@@ -1,12 +1,19 @@
 server <- function(input, output, session) {
   
-  observeEvent(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  observeEvent(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     repro_colname = repro_measure_choices[[input$repro_measure]]
     SELECTION <<- SIMS %>%
       mutate(repro_rate = SIMS[,repro_colname]) %>%
+      rename(
+        repro_rate_pi = `Orig-in-RMA-PI_ReproRate_All`,
+        repro_rate_sss = `RMA-SSS_ReproRate_All`,
+        repro_rate_vote = `VOTE-SSS_ReproRate_All`
+      ) %>%
       filter(
         distribution == input$distribution,
-        repro_rate >= input$repro_value[1] / 100 & repro_rate <= input$repro_value[2] / 100 &
+        repro_rate_pi >= input$repro_value_pi[1] / 100 & repro_rate_pi <= input$repro_value_pi[2] / 100 &
+        repro_rate_sss >= input$repro_value_sss[1] / 100 & repro_rate_sss <= input$repro_value_sss[2] / 100 &
+        repro_rate_vote >= input$repro_value_vote[1] / 100 & repro_rate_vote <= input$repro_value_vote[2] / 100 &
         bias.level >= input$bias_value[1] / 100 & bias.level <= input$bias_value[2] / 100 &
         typical.power >= input$power_value[1] / 100 & typical.power <= input$power_value[2] / 100 &
         weightB >= input$prevalence_value[1] / 100 & weightB <= input$prevalence_value[2] / 100 &
@@ -18,7 +25,7 @@ server <- function(input, output, session) {
     }
   })
   
-  draw_bias_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  draw_bias_plot = eventReactive(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
       aes(x = as.factor(bias.level)) +
       geom_bar() +
@@ -26,7 +33,7 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  draw_prevalence_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  draw_prevalence_plot = eventReactive(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
       aes(x = as.factor(weightB)) +
       geom_bar() +
@@ -34,7 +41,7 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  draw_interlab_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  draw_interlab_plot = eventReactive(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
       aes(x = as.factor(interlab.var.p)) +
       geom_bar() +
@@ -42,7 +49,7 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  draw_power_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  draw_power_plot = eventReactive(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     ggplot(SELECTION) +
       aes(x = as.factor(typical.power)) +
       geom_bar() +
@@ -50,7 +57,7 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  draw_repro_plot = eventReactive(c(input$repro_value, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
+  draw_repro_plot = eventReactive(c(input$repro_value_pi, input$repro_value_sss, input$repro_value_vote, input$bias_value, input$prevalence_value, input$interlab_value, input$power_value, input$repro_measure, input$distribution), {
     
     # Making the plot with reproducibility rates
     plot_repro = ggplot(SELECTION) +
@@ -91,6 +98,7 @@ server <- function(input, output, session) {
       labs(x = "", y = "") +
       scale_fill_manual(breaks = spec_parameters, values = spec_colors) +
       scale_x_discrete(expand = c(0,0)) +
+      scale_y_continuous(breaks = c(0, 0.5, 1)) +
       facet_wrap(~param_type, ncol = 1) +
       theme_minimal() +
       theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),

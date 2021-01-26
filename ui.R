@@ -7,21 +7,28 @@ ui <- fluidPage(
     fluidRow(
         
         column(3,
-            selectInput("repro_measure", "Measure", choices = names(repro_measure_choices)),
+            sliderInput("repro_value_pi", "Reproducibility (Pred. Int.)", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
             
-            sliderInput("repro_value", "Reproducibility", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
+            sliderInput("repro_value_sss", "Reproducibility (Signif.)", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
+            
+            sliderInput("repro_value_vote", "Reproducibility (Vote)", min = 0, max = 100, step = 5, value = c(0,100), post = "%"),
+            
             hr(),
-            sliderInput("bias_value", "Bias", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
             
-            sliderInput("prevalence_value", "Prevalence", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
+            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
             
             sliderInput("interlab_value", "Interlab Variation", min = 0, max = 100, step = 10, value = c(0,100)),
             
-            sliderInput("power_value", "Power", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
+            sliderInput("bias_value", "Bias", min = 0, max = 100, step = 10, value = c(0,100), post = "%"),
+            
+            sliderInput("prevalence_value", "Prevalence", min = 0, max = 100, step = 10, value = c(0,100), post = "%")
+            
         ),
         
         column(6,
-            plotOutput("repro_plot", height = 600, width = "95%")
+            plotOutput("repro_plot", height = 600, width = "95%"),
+            
+            selectInput("repro_measure", "Measure to show", choices = names(repro_measure_choices)),
         ),
         
         column(3,
